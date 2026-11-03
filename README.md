@@ -1,100 +1,371 @@
-# LAB · Reservas de equipos
+# Sistema de reservas de equipos de laboratorio
 
-**Autor: Nahuel Peralta.**
+**Autor:** Nahuel Peralta · **Challenge IA** · **Año:** 2026.
 
-Repositorio público: [nahuperalta12/challenge-reservas-topicos](https://github.com/nahuperalta12/challenge-reservas-topicos), rama `master`.
+Aplicación web local para consultar disponibilidad, reservar y cancelar equipos sin perder el historial, desarrollada con Codex y revisión humana. Repositorio público: [nahuperalta12/challenge-reservas-topicos](https://github.com/nahuperalta12/challenge-reservas-topicos), rama `master`.
 
-Trabajo práctico: sistema local para consultar disponibilidad, reservar y cancelar equipos sin perder su historial. Proyecto propio construido a partir de la consigna; los tres proyectos suministrados se consultaron como referencias de estructura y alcance. No se importaron sus historiales ni afirmaciones de verificación.
+**Estado:** 16 pruebas automáticas aprobadas y compilación correcta, verificadas también desde una copia limpia. Tres episodios reales con decisión humana y motivo registrados. El envío del enlace de entrega está pendiente. La primera implementación anterior a las restricciones horarias no está recuperada en Git; se declara esa limitación en [la auditoría](docs/auditoria.md).
+
+El README tiene las cuatro secciones de la consigna:
+
+1. [Especificación](#1-especificación).
+2. [Solución](#2-solución).
+3. [Preparación del agente](#3-preparación-del-agente).
+4. [Registro de decisiones y delegación](#4-registro-de-decisiones-y-delegación).
 
 ## 1. Especificación
 
-La coordinación del laboratorio necesita evitar reservas superpuestas y liberar los horarios cancelados. Se incluyen inventario fijo, disponibilidad por unidad e intervalo, creación, cancelación e historial persistente. No se incluyen administración del inventario, autenticación, notificaciones, pagos, despliegue ni servicios externos.
+### 1.1 Problema y objetivo
 
-Inventario precargado en `shared/types.ts`: MIC-01 y MIC-02 (microscopios digitales), OSC-01 (osciloscopio), MUL-01 (multímetro), FUE-01 (fuente de alimentación). Cada ID corresponde a una unidad física independiente.
+La coordinación de un laboratorio registra pedidos mediante mensajes y planillas. Esto puede confirmar una misma unidad en horarios superpuestos y mantener bloqueado un horario después de una cancelación. El objetivo es consultar disponibilidad, crear reservas identificables y cancelar conservando los datos y estados al reiniciar.
 
-| Requisito | Criterio de aceptación / evidencia automática |
+### 1.2 Alcance
+
+**Incluye:** inventario fijo, disponibilidad por unidad e intervalo, creación, cancelación, historial con búsqueda y filtro de estado en la web, persistencia SQLite y carga opcional de ejemplos ficticios. Cada reserva corresponde a una unidad física.
+
+**Fuera de alcance:** administración del inventario, edición o reactivación de reservas, autenticación y roles reales, notificaciones, pagos, integraciones de negocio, despliegue y concurrencia distribuida. GitHub se usa para entregar código; la aplicación se ejecuta localmente.
+
+### 1.3 Inventario precargado
+
+Versionado como constante en [shared/types.ts](shared/types.ts); no requiere carga manual ni una tabla editable.
+
+| ID de unidad | Equipo |
 | --- | --- |
-| R1 Inventario y disponibilidad | API devuelve cinco unidades y evalúa un intervalo válido con las reglas de reserva. |
-| R2 Crear una reserva identificable | Devuelve ID, unidad, solicitante ficticio no vacío, inicio, fin y estado ACTIVA. |
-| R3 Validar entradas | Rechaza unidad desconocida, solicitante vacío, fechas inexistentes e inicio mayor o igual al fin. |
-| R4 Evitar superposición | Rechaza conflictos activos de una misma unidad, incluso intervalos contenidos o envolventes. |
-| R5 Permitir consecutivos y distintas unidades | Acepta 11–12 después de 10–11 y MIC-02 simultánea a MIC-01. |
-| R6 Cancelar conservando historial | Cambia solo el estado a CANCELADA, conserva ID/datos y permite volver a reservar el intervalo. |
-| R7 Persistir | Un proceso escribe estados activos/cancelados y otro proceso los recupera sin borrar la base. |
-| R8 Web local con un comando | `npm start` compila y sirve interfaz y API en el mismo puerto. |
+| MIC-01 | Microscopio digital |
+| MIC-02 | Microscopio digital |
+| OSC-01 | Osciloscopio |
+| MUL-01 | Multímetro |
+| FUE-01 | Fuente de alimentación |
 
-**Reglas horarias actualizadas por revisión humana:** cada reserva comienza y termina el mismo día, entre **06:00 y 20:00**, con minutos **00, 15, 30 o 45**. El último inicio posible es 19:45. No se admiten inicios anteriores al instante actual, incluidos horarios ya pasados de hoy. La disponibilidad aplica las mismas reglas; el historial y la cancelación siguen accesibles para reservas anteriores. La interfaz ofrece selectores de cuartos de hora y un intervalo inicial futuro; el servidor vuelve a validar al operar.
+### 1.4 Requisitos funcionales verificables
 
-**Supuestos:** intervalos semiabiertos `[inicio, fin)`. Entradas `AAAA-MM-DDTHH:mm` en hora argentina UTC-03:00 fija; almacenamiento en milisegundos UTC y presentación en `America/Argentina/Buenos_Aires`. Años 1900–9999, sin límite adicional de anticipación. Solicitante limitado a 120 caracteres. Cancelar de nuevo una reserva cancelada es idempotente. Una reserva por unidad. Las reservas que ya existían no se borran ni se modifican por estas nuevas reglas. ACTIVA indica que no fue cancelada. El indicador “Libre ahora” se actualiza al renderizar y la operación de reservar siempre revalida disponibilidad.
+Se mantienen los identificadores **R1–R8** de la documentación anterior. RF-01–RF-10 los desglosan sin reemplazar la evidencia previa.
 
-La versión inicial y sus cambios deben conservarse en Git. La primera especificación de este repositorio es la presente; no se han inventado versiones anteriores.
+| ID | Requisito | Referencia previa | Evidencia |
+| --- | --- | --- | --- |
+| RF-01 | Mostrar las cinco unidades con ID y equipo. | R1 | API de inventario. |
+| RF-02 | Consultar disponibilidad y reservas activas en conflicto. | R1, R4, R5 | `Store.availability` y pruebas. |
+| RF-03 | Crear reserva con ID, unidad, solicitante, inicio, fin y estado ACTIVA. | R2 | `Store.create` y prueba de creación. |
+| RF-04 | Rechazar entradas inválidas sin insertar una reserva. | R3 | Dominio y pruebas de validación. |
+| RF-05 | Evitar solapamientos activos; permitir consecutivos y unidades distintas. | R4, R5 | Pruebas de conflictos, límites y simultaneidad. |
+| RF-06 | Cancelar conservando ID/datos y liberar el intervalo. | R6 | `Store.cancel` y pruebas. |
+| RF-07 | Listar reservas activas y canceladas, incluidas las históricas. | R6, R7 | API e historial React. |
+| RF-08 | Recuperar reservas y estados en otro proceso después del cierre. | R7 | Prueba de persistencia entre procesos. |
+| RF-09 | Compilar y servir interfaz y API con `npm start`. | R8 | Arranque y HTTP comprobados. |
+| RF-10 | Cargar ejemplos bajo pedido sin modificar registros previos ni duplicar la carga. | Ampliación, episodio 3 | `npm run seed` y dos pruebas. |
+
+Detalle: [docs/especificacion.md](docs/especificacion.md). Relación con funciones y nombres exactos de pruebas: [docs/trazabilidad.md](docs/trazabilidad.md).
+
+### 1.5 Reglas de negocio
+
+| ID | Regla |
+| --- | --- |
+| RN-01 | La unidad coincide exactamente con un ID del inventario. |
+| RN-02 | Solicitante ficticio no vacío ni solo espacios; recorte de extremos y máximo 120 caracteres. |
+| RN-03 | Entrada `AAAA-MM-DDTHH:mm`, fecha/hora existentes, años 1900–9999. |
+| RN-04 | Inicio estrictamente anterior al fin; ambos en la misma fecha argentina. |
+| RN-05 | Jornada 06:00–20:00 y minutos 00/15/30/45. Último inicio 19:45. |
+| RN-06 | Inicio no anterior al instante actual del servidor, considerando segundos transcurridos. |
+| RN-07 | Intervalos `[inicio, fin)`. Solo ACTIVA bloquea. |
+| RN-08 | Misma unidad: conflicto si `existente.start < nueva.end` y `existente.end > nueva.start`. |
+| RN-09 | Consecutivos y unidades distintas simultáneas permitidos. |
+| RN-10 | Disponibilidad y creación comparten validación de intervalo y consulta de conflictos; solo crear exige solicitante. |
+| RN-11 | Cancelar cambia solo el estado a CANCELADA; admite reservas históricas y nunca borra el registro. |
+| RN-12 | Repetir cancelación es idempotente; ID inválido devuelve 400 e inexistente 404. |
+
+Ejemplo: MIC-01 de 10:00 a 11:00 impide 10:30–11:30; permite 11:00–12:00 y MIC-02 de 10:00 a 11:00. Las restricciones horarias provienen de la corrección humana del episodio 2, posteriormente aceptada.
+
+### 1.6 Supuestos
+
+| ID | Supuesto adoptado |
+| --- | --- |
+| S-01 | Entradas en hora argentina UTC-03:00 fija, independientemente de la zona del equipo. |
+| S-02 | Fechas guardadas como milisegundos UTC y mostradas con `America/Argentina/Buenos_Aires`. La entrada no acepta `Z` ni offsets. |
+| S-03 | Duración mínima 15 minutos y máxima 14 horas por la jornada. Sin límite adicional de anticipación dentro de los años admitidos. |
+| S-04 | Reloj real del servidor; inyección de reloj solo en pruebas, sin opción de API para modificarlo. |
+| S-05 | ID entero autoincremental conservado al cancelar. ACTIVA significa no cancelada, aunque su horario ya haya terminado. |
+| S-06 | Uso local; transacción `BEGIN IMMEDIATE` para consulta e inserción. Sin concurrencia distribuida. |
+| S-07 | Iniciar no borra datos. Una ruta nueva permite otra base vacía conservando la anterior. |
+| S-08 | “Libre ahora” es orientativo; la operación siempre revalida en el servidor. |
+
+### 1.7 Criterios de aceptación
+
+Usar fechas futuras o reloj controlado. La evidencia automática corresponde al agente, no a una revisión humana.
+
+| ID | Se acepta si… | Verificación |
+| --- | --- | --- |
+| CA-01 | Se muestran exactamente las cinco unidades. | Automática, API. |
+| CA-02 | Una reserva válida obtiene ID, datos normalizados y estado ACTIVA. | Automática, dominio. |
+| CA-03 | Se rechazan conflictos parciales, contenidos, envolventes e iguales sin insertar. | Automática, dominio/API. |
+| CA-04 | Se permiten consecutivos por ambos extremos y unidades distintas simultáneas. | Automática, dominio. |
+| CA-05 | Se rechazan entradas inválidas, fuera de jornada, minutos incorrectos e inicios pasados. | Automática, dominio/API. |
+| CA-06 | Cancelar conserva datos, libera el intervalo, permite volver a reservar y es idempotente. | Automática, dominio/API. |
+| CA-07 | Disponibilidad y creación coinciden en validación y conflicto. | Automática, dominio. |
+| CA-08 | Otro proceso recupera una activa y una cancelada con estados y disponibilidad correctos. | Automática, procesos. |
+| CA-09 | `npm start` compila y sirve web/API en el mismo puerto local. | Arranque y HTTP comprobados. |
+| CA-10 | Las funciones del selector ofrecen cuartos de hora y un intervalo inicial futuro válido. | Automática de funciones; recorrido visual no completado. |
+| CA-11 | Nueva carga: ocho ejemplos; repetición: cero nuevos; registros previos conservados. | Automática y carga local comprobada. |
+
+Cada prueba puede cubrir varios casos. [La matriz](docs/trazabilidad.md) distingue cobertura automática, inspección de código y pasos manuales no informados.
+
+### 1.8 Modelo de datos
+
+SQLite guarda `reservations`; esquema real en [server/store.ts](server/store.ts).
+
+| Campo | Tipo | Significado |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Identificador. |
+| `unit` | TEXT NOT NULL | ID de unidad, validado en el dominio. |
+| `requester` | TEXT NOT NULL | Solicitante ficticio validado. |
+| `start`, `end` | INTEGER NOT NULL | Milisegundos UTC, CHECK `start < end`. |
+| `status` | TEXT NOT NULL | CHECK ACTIVA o CANCELADA. |
+
+Índice `reservations_interval(unit, status, start, end)`. No hay tabla de usuarios ni campos de fecha de creación o cancelación.
+
+### 1.9 Evolución de la especificación
+
+| Etapa | Cambio y motivo | Versión recuperable |
+| --- | --- | --- |
+| Primera construcción | Web, reservas e historial; inicialmente admitía pasado. | Registro narrativo; sin commit original recuperado. |
+| Episodio 2 | Jornada, cuartos de hora y rechazo de pasado por pedido humano. | Estado corregido capturado después en [`0a27447`](https://github.com/nahuperalta12/challenge-reservas-topicos/commit/0a27447). |
+| Episodio 3 | Auditoría y carga para facilitar pruebas. | [`6fa2060`](https://github.com/nahuperalta12/challenge-reservas-topicos/commit/6fa2060). |
+| Revisión y publicación | Autor, aceptación expresa, reproducción limpia y GitHub. | [`7b5762f`](https://github.com/nahuperalta12/challenge-reservas-topicos/commit/7b5762f), [`d3fe218`](https://github.com/nahuperalta12/challenge-reservas-topicos/commit/d3fe218). |
+| Ampliación documental | RF/RN/S/CA, trazabilidad y documentación similar a las referencias, sin cambiar comportamiento. | Commit que agrega especificacion.md y trazabilidad.md; consultar `git log`. |
+
+La primera especificación versionada corresponde al estado de `0a27447`, no a la implementación previa. Motivos y consecuencias: [decisiones](docs/decisiones.md).
 
 ## 2. Solución
 
-TypeScript en cliente y servidor, React para la interfaz, Express para API/archivos y SQLite integrado en Node para persistencia. Vite compila el cliente. Un proceso sirve todo; no hacen falta dos terminales. La transacción `BEGIN IMMEDIATE` engloba consulta de conflictos e inserción.
+### 2.1 Arquitectura y estructura
+
+TypeScript, React, Express, SQLite integrado en Node y Vite. Un proceso sirve interfaz y API. Flujo: **React → API Express → Store → dominio / SQLite**.
 
 ```text
-src/                 interfaz React y estilos adaptables
-shared/              inventario y tipos
-server/domain.ts     validaciones y fechas
-server/store.ts      persistencia y operaciones de reserva
-server/app.ts        API HTTP y archivos estáticos
-server/index.ts      arranque y cierre
-tests/               pruebas de dominio, HTTP y procesos
-docs/                decisiones, progreso, evidencia y revisión humana
-data/reservas.sqlite base creada automáticamente (excluida de Git)
+src/main.tsx              interfaz, búsqueda, filtros y confirmación de cancelación
+src/style.css             estilos adaptables
+shared/types.ts           inventario y contratos
+shared/schedule.ts        jornada y funciones de selección
+server/domain.ts          validación, fechas y errores
+server/store.ts           SQLite y operaciones
+server/app.ts             rutas HTTP y archivos estáticos
+server/index.ts           arranque y cierre
+server/demo.ts / seed.ts  ejemplos y comando de carga
+tests/                    dominio, API, procesos y ejemplos
+docs/                     especificación, agente, decisiones y evidencia
+data/reservas.sqlite      base local, excluida de Git
 ```
 
-Requisitos: **Node.js 24.15 o posterior**, npm y un navegador. Versiones del entorno y resultados en [docs/verificacion.md](docs/verificacion.md). El lockfile fija las dependencias resueltas. No se requiere cuenta de IA para ejecutar ni probar.
+`Store.create` inicia `BEGIN IMMEDIATE`, comprueba disponibilidad y guarda antes de confirmar. Ante error revierte. La interfaz no reemplaza la validación del servidor.
+
+### 2.2 Decisiones técnicas
+
+| Tema | Elección y motivo | Registro |
+| --- | --- | --- |
+| Interfaz | Web local y arranque único por preferencia del autor. | D1 |
+| Stack | TypeScript/React/Express para compartir lenguaje y tipos. | D2 |
+| Datos | SQLite, sin instalar motor externo. | D3 |
+| Fechas | UTC-03:00 explícito, independiente del equipo. | D4 |
+| Historial | Cambio de estado sin borrar; cancelación idempotente. | D6 |
+| Horarios | Reglas operativas solicitadas por el autor. | D8, D9 |
+| Ejemplos | Carga explícita, futura y sin duplicación. | D10 |
+
+Alternativas y consecuencias en [docs/decisiones.md](docs/decisiones.md).
+
+### 2.3 Requisitos previos y versiones
+
+| Herramienta | Requisito / versión observada | Comprobación |
+| --- | --- | --- |
+| Sistema | Desarrollo comprobado en Windows con PowerShell. | Entorno real. |
+| Node.js | **24.15 o posterior**; observado v24.15.0. | `node --version` |
+| npm | Observado 11.12.1. | `npm --version` |
+| Git | Observado 2.46.0.windows.1. | `git --version` |
+| Navegador | Acceso a localhost. | URL local. |
+
+Dependencias: [package.json](package.json); versiones resueltas: [package-lock.json](package-lock.json). No se requiere Python, motor SQLite separado ni cuenta de IA para ejecutar o probar.
+
+### 2.4 Instalación desde cero
 
 ```sh
+git clone https://github.com/nahuperalta12/challenge-reservas-topicos.git
+cd challenge-reservas-topicos
 npm ci
 npm start
 ```
 
-Abrir **http://localhost:3000**. `npm start` comprueba tipos, compila y arranca el servidor en la interfaz local 127.0.0.1. Ctrl+C lo detiene. En PowerShell, si `npm.ps1` está bloqueado, usar `npm.cmd ci` y `npm.cmd start`. Para modificar el puerto: `$env:PORT='3001'` antes del arranque.
+Abrir **http://localhost:3000**. Se ejecutan tipos/build y servidor en `127.0.0.1`. Ctrl+C detiene. Si PowerShell bloquea `npm.ps1`, usar `npm.cmd ci` y `npm.cmd start`.
 
-El inventario no requiere carga manual. La base se crea automáticamente en `data/reservas.sqlite`. Reiniciar la aplicación **no elimina reservas**. `RESERVAS_DB` permite otra ruta; las rutas relativas se resuelven desde la raíz del proyecto. Para empezar con datos vacíos sin perder el historial anterior, detener el servidor y elegir otra ruta de base. No hay un botón de borrado ni se necesita borrar el archivo. Respaldar copiando la base con el servidor detenido.
+### 2.5 Carga inicial y ejemplos
 
-Para cargar reservas ficticias reproducibles, ejecutar `npm run seed`. Agrega ocho registros `[DEMO]` (seis activos y dos cancelados) para mañana en Argentina, o el siguiente día sin conflictos dentro de 366 días. Usa las mismas validaciones y operaciones de reserva/cancelación del sistema. Incluye consecutivos, unidades simultáneas, cancelación que deja libre un horario y un horario reservado nuevamente. No borra ni modifica registros anteriores. Si ya encuentra registros `[DEMO]`, no vuelve a cargarlos ni reactiva cancelaciones. No se ejecuta automáticamente al arrancar. Respeta `RESERVAS_DB`. Guía de uso y datos efectivamente cargados: [docs/datos-demo.md](docs/datos-demo.md).
+La base se crea automáticamente y el inventario siempre está precargado. Una instalación nueva comienza sin reservas. Para disponer de ejemplos:
 
 ```sh
-npm test
-npm run typecheck
-npm run build
+npm run seed
+npm start
 ```
 
-Ejemplo de entrada HTTP (ilustrativo, solicitante ficticio):
+Agrega ocho registros `[DEMO]`: seis activos y dos cancelados para mañana en Argentina o el siguiente día sin conflictos dentro de 366 días. Si ya hay registros `[DEMO]`, no agrega más ni reactiva cancelaciones. Conserva datos previos y respeta `RESERVAS_DB`. La carga completa no es atómica: ante interrupción, revisar antes de repetir. Tabla y escenarios: [docs/datos-demo.md](docs/datos-demo.md).
+
+### 2.6 Persistencia y otra base vacía
+
+Por defecto: `data/reservas.sqlite`, excluida de Git. **Reiniciar no borra reservas.** Para otra base, detener el servidor y elegir una ruta nueva en PowerShell:
+
+```powershell
+$env:RESERVAS_DB='data/pruebas-nuevas.sqlite'
+npm start
+```
+
+Si la ruta existe, conserva sus datos. La anterior no se elimina. Para volver a la base predeterminada en una ejecución posterior:
+
+```powershell
+Remove-Item Env:RESERVAS_DB -ErrorAction SilentlyContinue
+npm start
+```
+
+Ese comando retira una variable, no un archivo. Las rutas relativas se resuelven desde el directorio de trabajo: ejecutar desde la raíz del proyecto. Respaldar copiando la base con el servidor detenido.
+
+### 2.7 Comandos y configuración
+
+| Comando / variable | Función |
+| --- | --- |
+| `npm ci` | Instalar según lockfile. |
+| `npm start` | Tipos, build y servidor web/API. |
+| `npm test` | Pruebas con bases independientes de la principal. |
+| `npm run typecheck` | Comprobar TypeScript. |
+| `npm run build` | Tipos y compilación a `dist/`. |
+| `npm run seed` | Carga explícita de ejemplos ficticios. |
+| `PORT` | Puerto 1–65535, por defecto 3000. |
+| `RESERVAS_DB` | Ruta, por defecto `data/reservas.sqlite`. |
+
+Otro puerto en PowerShell: `$env:PORT='3001'` y luego `npm start`.
+
+### 2.8 Uso web y ejemplos de API
+
+Seleccionar unidad, fecha e intervalo, consultar disponibilidad, ingresar solicitante ficticio y crear. El historial permite búsqueda por solicitante/unidad/ID y filtros de estado. Cancelar abre confirmación y conserva la fila cancelada. “Volver” no envía la cancelación.
+
+| Método y ruta | Respuesta correcta |
+| --- | --- |
+| `GET /api/inventory` | 200, cinco unidades. |
+| `GET /api/availability?unit=…&start=…&end=…` | 200, `{ available, conflicts }`. |
+| `POST /api/reservations` | 201, reserva creada. |
+| `GET /api/reservations` | 200, historial completo. |
+| `POST /api/reservations/:id/cancel` | 200, reserva CANCELADA. |
+
+Entrada ilustrativa en una base sin conflicto y con fecha futura:
 
 ```http
 POST /api/reservations
 Content-Type: application/json
 
-{"unit":"MIC-01","requester":"Investigador A","start":"2026-11-03T10:00","end":"2026-11-03T11:00"}
+{"unit":"MIC-01","requester":"Investigador A","start":"2099-11-03T10:00","end":"2099-11-03T11:00"}
 ```
 
-Devuelve HTTP 201 y un objeto como el siguiente (ilustrativo; ID variable y sujeto a disponibilidad y fecha futura):
+Salida 201 (ID ilustrativo):
 
 ```json
-{"id":1,"unit":"MIC-01","requester":"Investigador A","start":1793710800000,"end":1793714400000,"status":"ACTIVA"}
+{"id":1,"unit":"MIC-01","requester":"Investigador A","start":4097394000000,"end":4097397600000,"status":"ACTIVA"}
 ```
 
-Las fechas de salida son UTC en milisegundos. `GET /api/inventory`, `GET /api/reservations` y `GET /api/availability?unit=MIC-01&start=2026-11-03T10:00&end=2026-11-03T11:00` permiten consultar. Cancelar: `POST /api/reservations/1/cancel`. Validaciones devuelven 400; conflictos 409; reserva inexistente 404. El formato y los campos pertenecen a esta API, no a los proyectos de referencia.
+Con esa reserva, MIC-01 10:30–11:30 está ocupada y crear devuelve 409; MIC-01 11–12 y MIC-02 10–11 están disponibles. Cancelar ID 1 devuelve los mismos datos con CANCELADA y libera 10–11.
 
-**Limitaciones:** uso local, sin cuentas ni permisos por persona, sin paginación ni concurrencia distribuida. No incluye copias automáticas. `node:sqlite` puede emitir un aviso de experimental según la versión. Los resultados de los episodios 2 y 3 fueron aceptados por el autor; no se informó un recorrido manual paso a paso. Consultar el registro de verificación antes de asumir qué se probó. La entrega externa permanece pendiente.
+Errores JSON `{ "error": "mensaje" }`: 400 por datos inválidos, 404 por reserva inexistente y 409 por conflicto. Contratos y ejemplos ejecutables: [docs/api.md](docs/api.md).
+
+### 2.9 Pruebas y verificación
+
+```sh
+npm test
+npm run build
+```
+
+Resultado: **16 aprobadas, 0 fallos**, tipos y compilación correctos. Incluye dominio, API, persistencia entre dos procesos y carga demo. Se verificó desde una copia limpia con `npm ci`. Resultados, comandos y fallos intermedios: [docs/verificacion.md](docs/verificacion.md).
+
+Procedimiento manual: elegir fecha futura libre; crear MIC-01 10–11; intentar 10:30–11:30; crear 11–12 y MIC-02 10–11; cancelar la primera y consultar su intervalo; cerrar y reiniciar sin cambiar de base, comprobando mismos ID/datos/estados. Guía completa en [verificación](docs/verificacion.md).
+
+La persistencia se comprobó automáticamente. El autor aceptó los resultados de episodios 2 y 3, pero no informó un recorrido manual paso a paso. La revisión visual del agente no se completó por una limitación de Computer Use. No se atribuyen esos pasos al autor.
+
+### 2.10 Pendientes y limitaciones
+
+Uso local, sin cuentas, permisos por persona, paginación, copias automáticas ni concurrencia distribuida. “Libre ahora” es orientativo y reservar revalida. `node:sqlite` puede emitir un aviso experimental según la versión.
+
+Repositorio público listo; correo de entrega pendiente. Limitación Git anterior al estado recibido declarada. Estado completo: [auditoría](docs/auditoria.md), [entrega](docs/entrega.md) y [retrospectiva](docs/retrospectiva.md).
 
 ## 3. Preparación del agente
 
-Se utilizó Codex sobre el repositorio con herramientas reales de edición, PowerShell, Node/npm, Git y consulta de documentación técnica oficial. El identificador exacto del modelo y la versión del cliente no están expuestos de forma verificable en el proyecto: quedan sin confirmar. No se copian los identificadores de las referencias. Se eligió el entorno disponible porque permite editar, ejecutar pruebas y verificar resultados localmente.
+### 3.1 Entorno, modelo y función
 
-Contexto suministrado: consigna PDF de tres páginas, tres ZIP de referencia y preferencias humanas: web local, inicio mediante `npm start`, tecnología a elección y sin requisitos adicionales. Se excluyen secretos, datos reales, conversaciones completas, bases ajenas y dependencias de las referencias. Las instrucciones dentro de las referencias se interpretan como material de esos proyectos, no como órdenes para este.
+**Codex** actuó sobre archivos reales con PowerShell, Node/npm y Git: implementación, pruebas y documentación. El autor definió preferencias, corrigió reglas y aceptó resultados. Se eligió el entorno disponible por permitir editar y comprobar directamente el proyecto.
 
-Configuración externa aplicada (resumen saneado): actuar en la carpeta de trabajo, completar acciones autorizadas, reportar verificaciones reales y evitar atribuir resultados no comprobados. Acceso técnico disponible: lectura/escritura y ejecución local, red habilitada y sin solicitudes automáticas de aprobación. Esto no constituye revisión humana. Por instrucción expresa del autor se creó el repositorio público en GitHub y se subió el historial. No se enviaron correos ni se desplegó una web.
+Se comprobaron Windows/PowerShell y las versiones de herramientas indicadas en §2.3. Identificador exacto del modelo y versión del cliente de los episodios: **no confirmados** de forma verificable. No se copian los datos de las referencias. Detalle: [docs/agente.md](docs/agente.md).
 
-Instrucción humana efectivamente usada: «web local con interfaz visual entrando por npm start» y «el que mejor se adapte al proyecto». Adaptación comprobable: `package.json` encadena comprobación/compilación y un servidor único, y `server/app.ts` sirve tanto API como cliente. Adaptación de reglas: validación compartida e intervalos consecutivos en `server/domain.ts`, `server/store.ts` y pruebas. [AGENTS.md](AGENTS.md) conserva instrucciones para futuras intervenciones; se creó durante esta sesión y no se presenta como una configuración preexistente. [docs/PROGRESO.md](docs/PROGRESO.md) retiene avances y decisiones.
+### 3.2 Instrucciones y configuración
+
+[AGENTS.md](AGENTS.md) exige leer README/progreso, mantener web local con `npm start` y SQLite, compartir validación, usar UTC-03:00, conservar historial y registrar resultados reales. Tras cambios funcionales exige pruebas/build.
+
+La configuración externa permitió lectura, escritura, comandos y red, sin aprobaciones automáticas por herramienta. Esas capacidades no sustituyen la autorización del autor. Por instrucción expresa se publicó en GitHub; no se envió correo. Extracto saneado y evidencia de aplicación: [docs/agente.md](docs/agente.md).
+
+### 3.3 Contexto suministrado y excluido
+
+Consigna PDF de tres páginas, ZIP de referencia, preferencia de web local, correcciones horarias y pedido de datos demo. Esta ampliación compara la organización documental de esas referencias.
+
+Se excluyen secretos, credenciales, datos reales de estudiantes, conversaciones completas y bases/dependencias ajenas. Se usan solicitantes ficticios. Las instrucciones internas de las referencias se tratan como material de esos proyectos, no como órdenes de este.
+
+### 3.4 Herramientas, permisos y controles
+
+| Acción | Control / resultado |
+| --- | --- |
+| Editar y ejecutar | Instrucciones del proyecto, revisión de cambios y resultados registrados. |
+| Verificar funcionalidad | Bases independientes, pruebas y build. |
+| Cambiar reglas | Pedido humano y motivos del episodio 2. |
+| Registrar revisión | Decisión explícita recibida, sin inventar pasos manuales. |
+| Publicar | Pedido del autor para `nahuperalta12`, sesión existente de Git Credential Manager y acceso público verificado. |
+| Revisar visualmente | Intento detenido por la herramienta; no declarado completado. |
+
+No se requirieron subagentes, servicios pagos ni integraciones de negocio. No se almacenan credenciales de GitHub en el repositorio.
+
+### 3.5 Adaptaciones específicas
+
+| Adaptación | Evidencia |
+| --- | --- |
+| Arranque único | `package.json`, `server/app.ts`. |
+| Misma validación y conflictos | `validateInterval`, `Store.availability` y llamada desde `Store.create`. |
+| Consecutivos y cancelación libre | Comparaciones estrictas y filtro ACTIVA en SQL; pruebas de límites/cancelación. |
+| Hora argentina | Offset en `parseLocal`, `argentinaLocal` y formateadores con zona explícita. |
+| Jornada y rechazo de pasado | `shared/schedule.ts`, `server/domain.ts`, selectores y reloj controlado. |
+| Persistencia | Prueba de escritura/lectura en procesos independientes. |
+
+### 3.6 Retención del progreso
+
+Se conserva en [PROGRESO](docs/PROGRESO.md), [decisiones](docs/decisiones.md), [episodios](docs/episodios.md), [verificación](docs/verificacion.md) y Git. Al retomar se leen README y progreso. Los registros históricos muestran el estado de cada etapa; entradas posteriores documentan su resolución. No se reconstruye una historia inicial inexistente.
 
 ## 4. Registro de decisiones y delegación
 
-Consultar [docs/decisiones.md](docs/decisiones.md), [docs/episodios.md](docs/episodios.md) y [docs/verificacion.md](docs/verificacion.md).
+### 4.1 Decisiones significativas
 
-**Estado académico:** hay tres delegaciones reales con decisión humana y motivo registrados: corrección de la primera versión y aceptación expresa de los episodios 2 y 3 por Nahuel Peralta. La aceptación no se presenta como ejecución de un procedimiento manual no informado. Git conserva el estado recibido antes de la auditoría y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Esa evidencia histórica sigue siendo una limitación. El repositorio remoto ya está publicado y se verificó su acceso público sin autenticación. Falta enviar el enlace de entrega por correo. Rama: `master`; commit exacto: `git rev-parse HEAD`. Auditoría: [docs/auditoria.md](docs/auditoria.md). Preparación y procedimiento de entrega: [docs/entrega.md](docs/entrega.md).
+D1–D11 documentan interfaz, stack, SQLite, zona horaria, cancelación, evolución horaria, ejemplos y versionado. D12 registra esta ampliación documental solicitada por el autor. Motivos, alternativas y consecuencias: [docs/decisiones.md](docs/decisiones.md).
+
+### 4.2 Tres episodios reales
+
+| Episodio | Objetivo / instrucción | Resultado | Decisión humana y motivo | Evidencia |
+| --- | --- | --- | --- | --- |
+| 1. Primera web | «web local con interfaz visual entrando por npm start»; tecnología a criterio. | Aplicación, SQLite, pruebas y documentación. | **CORREGIR:** jornada, cuartos de hora y rechazo de pasado. | Registro narrativo; primera implementación sin commit recuperado. |
+| 2. Horarios | «horarios sean de 6am y como maximo 8pm», minutos cada 15 y no reservar pasado. | Validación compartida, selectores y pruebas. | **ACEPTAR:** franja de laboratorio estándar para realismo; no admitir pasado para integridad. | Dominio, schedule y pruebas; estado corregido en `0a27447`. |
+| 3. Auditoría y ejemplos | Revisar requisitos y cargar registros para probar. | Auditoría, ocho ejemplos y dos pruebas nuevas. | **ACEPTAR:** disponer de datos para controlar funcionamiento. | `server/demo.ts`, `tests/demo.test.ts`, datos-demo.md; `6fa2060`. |
+
+El autor confirmó para episodios 2 y 3: «Acepto ambos resultados por los motivos que expliqué». No se equipara con ejecutar una guía manual no informada. Contexto, extractos, acciones y motivos completos: [docs/episodios.md](docs/episodios.md).
+
+### 4.3 Mapa de documentación
+
+| Documento | Contenido |
+| --- | --- |
+| [Especificación](docs/especificacion.md) | Requisitos, reglas, supuestos, aceptación y datos. |
+| [Trazabilidad](docs/trazabilidad.md) | Requisito → código → prueba → evidencia. |
+| [API](docs/api.md) | Rutas, entradas/salidas y errores. |
+| [Agente](docs/agente.md) | Entorno, instrucciones, contexto y controles. |
+| [Decisiones](docs/decisiones.md) | Motivos, alternativas y consecuencias. |
+| [Episodios](docs/episodios.md) | Delegaciones y decisiones humanas reales. |
+| [Verificación](docs/verificacion.md) | Comandos, resultados y pasos pendientes. |
+| [Progreso](docs/PROGRESO.md) | Avances por etapa. |
+| [Retrospectiva](docs/retrospectiva.md) | Resultados, dificultades y comparación documental. |
+| [Auditoría](docs/auditoria.md) | Cumplimiento y limitaciones. |
+| [Entrega](docs/entrega.md) | Repositorio, rama y correo pendiente. |
+
+Se adoptan la organización y el detalle de las referencias suministradas. Los requisitos reflejan esta web TypeScript: jornada 06–20, cancelación idempotente y conservación de bases. Los modelos, commits, herramientas y verificaciones de los otros proyectos no se presentan como propios.

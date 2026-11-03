@@ -1,0 +1,200 @@
+{
+  "performedBy": "agente Codex",
+  "executedAtUtc": "2026-11-03T01:31:57.250Z",
+  "database": ":memory:",
+  "description": "Secuencia de API documentada. Servidor HTTP efímero; no usa la base principal. No acredita revisión humana ni visual.",
+  "steps": [
+    {
+      "method": "GET",
+      "path": "/inventory",
+      "status": 200,
+      "output": [
+        {
+          "id": "MIC-01",
+          "name": "Microscopio digital",
+          "category": "Óptica",
+          "symbol": "◉"
+        },
+        {
+          "id": "MIC-02",
+          "name": "Microscopio digital",
+          "category": "Óptica",
+          "symbol": "◉"
+        },
+        {
+          "id": "OSC-01",
+          "name": "Osciloscopio",
+          "category": "Medición",
+          "symbol": "∿"
+        },
+        {
+          "id": "MUL-01",
+          "name": "Multímetro",
+          "category": "Medición",
+          "symbol": "Ω"
+        },
+        {
+          "id": "FUE-01",
+          "name": "Fuente de alimentación",
+          "category": "Energía",
+          "symbol": "ϟ"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/reservations",
+      "input": {
+        "unit": "MIC-01",
+        "requester": "Investigador A",
+        "start": "2099-11-03T10:00",
+        "end": "2099-11-03T11:00"
+      },
+      "status": 201,
+      "output": {
+        "id": 1,
+        "unit": "MIC-01",
+        "requester": "Investigador A",
+        "start": 4097394000000,
+        "end": 4097397600000,
+        "status": "ACTIVA"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/availability?unit=MIC-01&start=2099-11-03T10:30&end=2099-11-03T11:30",
+      "status": 200,
+      "output": {
+        "available": false,
+        "conflicts": [
+          {
+            "id": 1,
+            "unit": "MIC-01",
+            "requester": "Investigador A",
+            "start": 4097394000000,
+            "end": 4097397600000,
+            "status": "ACTIVA"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/reservations",
+      "input": {
+        "unit": "MIC-01",
+        "requester": "Investigador A",
+        "start": "2099-11-03T10:30",
+        "end": "2099-11-03T11:30"
+      },
+      "status": 409,
+      "output": {
+        "error": "La unidad ya tiene una reserva activa en ese horario."
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/reservations",
+      "input": {
+        "unit": "MIC-01",
+        "requester": "Investigador B",
+        "start": "2099-11-03T11:00",
+        "end": "2099-11-03T12:00"
+      },
+      "status": 201,
+      "output": {
+        "id": 2,
+        "unit": "MIC-01",
+        "requester": "Investigador B",
+        "start": 4097397600000,
+        "end": 4097401200000,
+        "status": "ACTIVA"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/reservations",
+      "input": {
+        "unit": "MIC-02",
+        "requester": "Investigador C",
+        "start": "2099-11-03T10:00",
+        "end": "2099-11-03T11:00"
+      },
+      "status": 201,
+      "output": {
+        "id": 3,
+        "unit": "MIC-02",
+        "requester": "Investigador C",
+        "start": 4097394000000,
+        "end": 4097397600000,
+        "status": "ACTIVA"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/reservations/1/cancel",
+      "status": 200,
+      "output": {
+        "id": 1,
+        "unit": "MIC-01",
+        "requester": "Investigador A",
+        "start": 4097394000000,
+        "end": 4097397600000,
+        "status": "CANCELADA"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/availability?unit=MIC-01&start=2099-11-03T10:00&end=2099-11-03T11:00",
+      "status": 200,
+      "output": {
+        "available": true,
+        "conflicts": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/reservations/1/cancel",
+      "status": 200,
+      "output": {
+        "id": 1,
+        "unit": "MIC-01",
+        "requester": "Investigador A",
+        "start": 4097394000000,
+        "end": 4097397600000,
+        "status": "CANCELADA"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/reservations",
+      "status": 200,
+      "output": [
+        {
+          "id": 2,
+          "unit": "MIC-01",
+          "requester": "Investigador B",
+          "start": 4097397600000,
+          "end": 4097401200000,
+          "status": "ACTIVA"
+        },
+        {
+          "id": 3,
+          "unit": "MIC-02",
+          "requester": "Investigador C",
+          "start": 4097394000000,
+          "end": 4097397600000,
+          "status": "ACTIVA"
+        },
+        {
+          "id": 1,
+          "unit": "MIC-01",
+          "requester": "Investigador A",
+          "start": 4097394000000,
+          "end": 4097397600000,
+          "status": "CANCELADA"
+        }
+      ]
+    }
+  ]
+}

@@ -55,3 +55,13 @@ Revisión humana posterior: Nahuel Peralta confirmó «Acepto ambos resultados p
 - `git push -u origin master`: correcto; rama publicada desde el historial local, sin forzar ni reemplazar un repositorio previo.
 - Acceso anónimo a https://github.com/nahuperalta12/challenge-reservas-topicos y a la referencia API `git/ref/heads/master`: HTTP 200 en ambos casos. SHA comprobado inicialmente: `7b5762f7e10908ff6695690f4488801d2d2b16de`.
 - Se publica después un commit exclusivamente documental que registra la operación. Las pruebas funcionales vigentes son las 16 aprobadas de la copia limpia; no se repitieron por cambios documentales. El correo no fue enviado.
+
+## Ampliación documental y ejemplos de API · 2026-11-02
+
+Se contrastaron requisitos, reglas, esquema y contratos documentados con shared/types.ts, shared/schedule.ts, server/domain.ts, server/store.ts, server/app.ts, src/main.tsx y las 16 pruebas existentes. No cambió código funcional; no se vuelve a presentar la suite anterior como una nueva ejecución.
+
+Se ejecutó `node --import tsx tmp/verificar-api-documentada.ts`, un script auxiliar del agente, con Express real en un puerto efímero y Store en memoria. Comprobó diez solicitudes y sus respuestas, con aserciones sobre estado HTTP y datos: inventario con cinco ID exactos; creación MIC-01 2099-11-03 10–11; consulta ocupada 10:30–11:30; creación conflictiva 409; consecutiva 11–12; MIC-02 simultánea; cancelación conservando todos los campos; franja liberada; reintento idempotente; historial de tres registros, dos activos y uno cancelado. Los milisegundos UTC del ejemplo README se comprobaron contra la respuesta real.
+
+Resultado: diez solicitudes correctas, todas las aserciones aprobadas. Solicitudes/respuestas completas y sello UTC de la ejecución: [evidencia/api-documentada.json](evidencia/api-documentada.json). No se escribió en la base principal ni se ejecutó una revisión visual. La guía PowerShell de api.md sigue siendo un procedimiento reproducible, no una prueba atribuida al autor.
+
+Se comprobaron enlaces relativos y anclas locales de Markdown en 13 documentos: 80 enlaces internos, cero errores en la primera revisión; la referencia adicional de trazabilidad apunta al JSON ya existente. `git diff --check` no informó errores de espacios. La matriz trazabilidad.md identifica límites de cobertura: prueba de cantidad del inventario frente a la comprobación adicional de ID exactos, selector lógico frente a recorrido visual y filtros de interfaz inspeccionados sin una suite de navegador.

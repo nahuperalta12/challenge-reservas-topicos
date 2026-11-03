@@ -44,3 +44,12 @@
 - Se creó el repositorio público https://github.com/nahuperalta12/challenge-reservas-topicos, se configuró `origin` y se ejecutó `git push -u origin master`, conservando el historial. Código inicial publicado: `7b5762f`.
 - Página pública y referencia de `master` comprobadas mediante HTTP sin autenticación, ambas 200. La documentación de publicación se guarda en el commit posterior y se sube a la misma rama.
 - La base SQLite, node_modules y temporales permanecen excluidos. No hubo cambios funcionales ni se envió correo. Pendiente: envío del enlace de entrega y limitación de evidencia histórica anterior ya declarada.
+
+## 2026-11-02 · Ampliación documental solicitada por el autor
+
+- Instrucción humana: «en base a los demas readme no observo documentacion de requisitos entre otros, quiero que sea lo mas similar posible a los otros proyectos».
+- Se inspeccionaron los README de cuatro ZIP de referencia y la especificación, preparación del agente y retrospectiva de la referencia lab-reservas_TopicosAVANZADOS, sin modificarlos ni importar sus afirmaciones de verificación.
+- El README se reorganizó con las cuatro secciones de la consigna y subsecciones numeradas. Se explicitan problema, alcance, inventario, RF-01–RF-10, RN-01–RN-12, S-01–S-08, CA-01–CA-11, modelo SQLite, evolución, instalación, uso/API, datos, pruebas, agente y episodios.
+- Nuevos documentos propios: especificacion.md, trazabilidad.md, agente.md, api.md y retrospectiva.md. Se conservan los identificadores históricos R1–R8 y se distingue evidencia automática, inspección de código y pasos manuales no informados.
+- Se comprobó la secuencia API documentada en un servidor efímero con base en memoria: diez solicitudes, creación/conflicto/consecutivo/simultánea/cancelación/reintento/historial correctos. Resultado final: tres filas, dos activas y una cancelada. Evidencia real en docs/evidencia/api-documentada.json. No se tocó la base principal.
+- Cambio documental, sin modificaciones funcionales ni nuevos episodios humanos inventados. Las aceptaciones de episodios 2 y 3 conservan su alcance; no se extienden a esta ampliación sin una respuesta del autor.
