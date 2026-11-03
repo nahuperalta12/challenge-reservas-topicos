@@ -1,5 +1,7 @@
 # LAB · Reservas de equipos
 
+**Autor: Nahuel Peralta.**
+
 Trabajo práctico: sistema local para consultar disponibilidad, reservar y cancelar equipos sin perder su historial. Proyecto propio construido a partir de la consigna; los tres proyectos suministrados se consultaron como referencias de estructura y alcance. No se importaron sus historiales ni afirmaciones de verificación.
 
 ## 1. Especificación
@@ -69,9 +71,15 @@ Content-Type: application/json
 {"unit":"MIC-01","requester":"Investigador A","start":"2026-11-03T10:00","end":"2026-11-03T11:00"}
 ```
 
-Devuelve HTTP 201 y un objeto con ID numérico, `status: "ACTIVA"` y fechas UTC en milisegundos. `GET /api/inventory`, `GET /api/reservations` y `GET /api/availability?unit=MIC-01&start=2026-11-03T10:00&end=2026-11-03T11:00` permiten consultar. Cancelar: `POST /api/reservations/1/cancel`. Validaciones devuelven 400; conflictos 409; reserva inexistente 404. El formato y los campos pertenecen a esta API, no a los proyectos de referencia.
+Devuelve HTTP 201 y un objeto como el siguiente (ilustrativo; ID variable y sujeto a disponibilidad y fecha futura):
 
-**Limitaciones:** uso local, sin cuentas ni permisos por persona, sin paginación ni concurrencia distribuida. No incluye copias automáticas. `node:sqlite` puede emitir un aviso de experimental según la versión. La interfaz requiere revisión humana; consultar el registro de verificación antes de asumir qué se probó. La entrega y las revisiones humanas de los episodios 2 y 3 permanecen pendientes.
+```json
+{"id":1,"unit":"MIC-01","requester":"Investigador A","start":1793710800000,"end":1793714400000,"status":"ACTIVA"}
+```
+
+Las fechas de salida son UTC en milisegundos. `GET /api/inventory`, `GET /api/reservations` y `GET /api/availability?unit=MIC-01&start=2026-11-03T10:00&end=2026-11-03T11:00` permiten consultar. Cancelar: `POST /api/reservations/1/cancel`. Validaciones devuelven 400; conflictos 409; reserva inexistente 404. El formato y los campos pertenecen a esta API, no a los proyectos de referencia.
+
+**Limitaciones:** uso local, sin cuentas ni permisos por persona, sin paginación ni concurrencia distribuida. No incluye copias automáticas. `node:sqlite` puede emitir un aviso de experimental según la versión. Los resultados de los episodios 2 y 3 fueron aceptados por el autor; no se informó un recorrido manual paso a paso. Consultar el registro de verificación antes de asumir qué se probó. La entrega externa permanece pendiente.
 
 ## 3. Preparación del agente
 
@@ -87,4 +95,4 @@ Instrucción humana efectivamente usada: «web local con interfaz visual entrand
 
 Consultar [docs/decisiones.md](docs/decisiones.md), [docs/episodios.md](docs/episodios.md) y [docs/verificacion.md](docs/verificacion.md).
 
-**Estado académico:** hay tres delegaciones reales registradas; las decisiones humanas sobre los resultados de los episodios 2 y 3 siguen pendientes. Se inicializó Git durante la auditoría: conserva el estado recibido antes de este cambio y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Faltan completar esa evidencia histórica si existe, identificar autor y preparar el enlace del repositorio accesible para la entrega. Rama local: `master`; commit exacto: `git rev-parse HEAD`. No se publicó ni envió nada. Auditoría contra la consigna original: [docs/auditoria.md](docs/auditoria.md).
+**Estado académico:** hay tres delegaciones reales con decisión humana y motivo registrados: corrección de la primera versión y aceptación expresa de los episodios 2 y 3 por Nahuel Peralta. La aceptación no se presenta como ejecución de un procedimiento manual no informado. Git conserva el estado recibido antes de la auditoría y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Esa evidencia histórica sigue siendo una limitación. Faltan crear el repositorio remoto, comprobar acceso y entregar su enlace. Rama local: `master`; commit exacto: `git rev-parse HEAD`. No se publicó ni envió nada. Auditoría: [docs/auditoria.md](docs/auditoria.md). Preparación y procedimiento de entrega: [docs/entrega.md](docs/entrega.md).

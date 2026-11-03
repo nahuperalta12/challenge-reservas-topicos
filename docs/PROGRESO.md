@@ -25,3 +25,14 @@
 - `npm start` dejó la web en http://localhost:3000. Página HTTP 200, cinco unidades, ocho reservas; consultas HTTP verificaron conflicto, límite libre, cancelación libre y reocupación.
 - Git no existía. Se inicializó localmente y se guardó el estado recibido como `0a27447`; los cambios de esta auditoría quedan en el siguiente commit. Esto no reconstruye versiones originales anteriores al estado recibido ni revisiones humanas ausentes.
 - Pendientes actuales: decisiones humanas con motivo sobre episodios 2 y 3, evidencia Git histórica anterior si existe, identificación del autor y entrega del repositorio accesible. No se publicó, hizo push ni envió correo.
+
+## 2026-11-02 · Revisión humana y preparación de entrega
+
+- Autor confirmado por el usuario: Nahuel Peralta. Informó que aún no subió el repositorio.
+- El autor explicó los motivos de los episodios 2 y 3 y luego confirmó expresamente: «Acepto ambos resultados por los motivos que expliqué». Se registró ACEPTAR en ambos, con sus motivos, sin atribuirle pasos manuales que no informó.
+- Se clonó el commit `6fa2060` en `tmp/verificacion-limpia` sin dependencias ni base. `npm ci` correcto, 16 pruebas aprobadas y build correcto. El código funcional no cambió en esta preparación.
+- Se corrigió el arranque auxiliar del agente: un intento usó una ruta inexistente a npm-cli.js y falló. Luego se usó la instalación real de npm, y `npm start` compiló y dejó el servicio local respondiendo HTTP 200.
+- La base principal contiene ahora diez reservas: siete activas y tres canceladas. No se modificó ninguna en esta preparación; no se atribuye a esta observación un recorrido de prueba humano.
+- El intento de revisión visual del agente volvió a detenerse porque Computer Use no pudo verificar la URL en Windows. No se insistió ni se declara esa revisión completada.
+- Se preparó `docs/entrega.md` con procedimiento de publicación y borrador de correo no enviado. La conexión GitHub fue sugerida; no está confirmada. Se prepara copia de código y bundle con historial bajo `tmp/entrega` (excluidos de Git).
+- Pendientes: evidencia histórica anterior al primer commit si existe, cuenta/repositorio remoto, comprobación de acceso y envío de enlace. La aceptación humana de los episodios 2 y 3 y la identificación del autor ya están completas.
