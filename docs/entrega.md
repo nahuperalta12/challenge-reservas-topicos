@@ -2,6 +2,8 @@
 
 Autor confirmado por el usuario: **Nahuel Peralta**. Proyecto: LAB · Reservas de equipos. Rama: `master`. Esta guía no afirma que la entrega se haya realizado.
 
+Repositorio público creado por instrucción del autor: https://github.com/nahuperalta12/challenge-reservas-topicos. Historial subido a `master`; acceso público sin autenticación comprobado. El envío del correo sigue pendiente.
+
 ## Estado local
 
 - Aplicación, inventario, pruebas, lockfile y documentación versionados.
@@ -9,7 +11,7 @@ Autor confirmado por el usuario: **Nahuel Peralta**. Proyecto: LAB · Reservas d
 - Instalación limpia, 16 pruebas y build verificados: `verificacion.md`.
 - Datos reproducibles con `npm run seed`; la base de uso se conserva localmente y no se publica.
 - Limitación histórica declarada: el primer commit captura el sistema ya corregido; no existe en este Git la implementación anterior a las restricciones horarias. No se inventó ni reconstruyó como evidencia original.
-- El usuario informó que todavía no subió el repositorio. No hay remoto configurado.
+- Remoto `origin` configurado en https://github.com/nahuperalta12/challenge-reservas-topicos.git y rama `master` publicada. La cuenta autenticada se comprobó como `nahuperalta12`; no se almacenan credenciales en el proyecto.
 
 ## Publicar conservando el historial
 
@@ -21,7 +23,7 @@ git push -u origin master
 git rev-parse HEAD
 ```
 
-No usar la URL de ejemplo literalmente. Para crear/publicar mediante el agente falta que el usuario indique su cuenta o destino y que GitHub esté conectado. El ZIP de código por sí solo no conserva el historial: publicar desde este repositorio local o restaurar el bundle preparado.
+Los comandos anteriores son una referencia para una instalación nueva; no repetir `remote add` en esta copia, que ya tiene `origin`. La publicación se realizó mediante la sesión existente de Git Credential Manager, sin instalar una integración adicional. El ZIP de código por sí solo no conserva el historial: usar el repositorio remoto o restaurar el bundle preparado.
 
 ## Comprobar el repositorio remoto
 
@@ -35,7 +37,7 @@ npm run seed
 npm start
 ```
 
-Abrir http://localhost:3000. Confirmar el commit con `git rev-parse HEAD`. Estos comandos sobre el remoto no se ejecutaron porque aún no existe; la reproducción desde un clon local sí fue verificada.
+Abrir http://localhost:3000. Confirmar el commit con `git rev-parse HEAD`. La instalación y las pruebas se verificaron desde un clon local limpio; la publicación posterior cambió documentación, sin cambios funcionales. Se verificaron la página pública y la referencia remota de la rama, sin atribuir una segunda instalación desde el remoto.
 
 ## Borrador de correo — no enviado
 
@@ -48,7 +50,7 @@ Hola:
 
 Soy Nahuel Peralta. Comparto el repositorio del sistema local de reservas de equipos:
 
-[REEMPLAZAR POR EL ENLACE REAL Y COMPROBAR SU ACCESO]
+https://github.com/nahuperalta12/challenge-reservas-topicos
 
 Rama: master
 Commit: [REEMPLAZAR POR git rev-parse HEAD]
@@ -61,4 +63,4 @@ Saludos,
 Nahuel Peralta
 ```
 
-El borrador queda pendiente de completar con enlace/commit reales y de enviar por instrucción del autor. No se adjuntan credenciales, conversaciones completas ni bases de uso.
+El borrador queda pendiente de completar con el commit actual y de enviar por instrucción del autor. El enlace real ya tiene acceso público comprobado. No se adjuntan credenciales, conversaciones completas ni bases de uso.

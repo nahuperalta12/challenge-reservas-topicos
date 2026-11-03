@@ -36,3 +36,11 @@
 - El intento de revisión visual del agente volvió a detenerse porque Computer Use no pudo verificar la URL en Windows. No se insistió ni se declara esa revisión completada.
 - Se preparó `docs/entrega.md` con procedimiento de publicación y borrador de correo no enviado. La conexión GitHub fue sugerida; no está confirmada. Se prepara copia de código y bundle con historial bajo `tmp/entrega` (excluidos de Git).
 - Pendientes: evidencia histórica anterior al primer commit si existe, cuenta/repositorio remoto, comprobación de acceso y envío de enlace. La aceptación humana de los episodios 2 y 3 y la identificación del autor ya están completas.
+
+## 2026-11-02 · Publicación en GitHub solicitada por el autor
+
+- Instrucción humana: «crea un repositorio github mi usuario es nahuperalta12».
+- Se comprobó la sesión existente de Git Credential Manager y la cuenta autenticada `nahuperalta12`, sin mostrar ni guardar credenciales en archivos.
+- Se creó el repositorio público https://github.com/nahuperalta12/challenge-reservas-topicos, se configuró `origin` y se ejecutó `git push -u origin master`, conservando el historial. Código inicial publicado: `7b5762f`.
+- Página pública y referencia de `master` comprobadas mediante HTTP sin autenticación, ambas 200. La documentación de publicación se guarda en el commit posterior y se sube a la misma rama.
+- La base SQLite, node_modules y temporales permanecen excluidos. No hubo cambios funcionales ni se envió correo. Pendiente: envío del enlace de entrega y limitación de evidencia histórica anterior ya declarada.

@@ -47,3 +47,11 @@ Fallo real del arranque auxiliar anterior: se intentó invocar una ruta a npm-cl
 Revisión visual del agente: no completada. La herramienta detuvo Computer Use por no poder determinar la URL actual con suficiente confianza; no se continuó la automatización de UI en ese turno.
 
 Revisión humana posterior: Nahuel Peralta confirmó «Acepto ambos resultados por los motivos que expliqué», referida explícitamente a episodios 2 y 3. Motivos registrados en `episodios.md`. No informó resultados paso a paso de la guía manual y no se los atribuye. Las modificaciones posteriores a la reproducción limpia son documentales, sin cambio funcional.
+
+## Publicación autorizada en GitHub · 2026-11-02
+
+- Cuenta autenticada comprobada mediante API: `nahuperalta12`, usando la sesión existente de Git Credential Manager sin exponer sus credenciales.
+- Creación por API de `nahuperalta12/challenge-reservas-topicos`: correcta, repositorio público.
+- `git push -u origin master`: correcto; rama publicada desde el historial local, sin forzar ni reemplazar un repositorio previo.
+- Acceso anónimo a https://github.com/nahuperalta12/challenge-reservas-topicos y a la referencia API `git/ref/heads/master`: HTTP 200 en ambos casos. SHA comprobado inicialmente: `7b5762f7e10908ff6695690f4488801d2d2b16de`.
+- Se publica después un commit exclusivamente documental que registra la operación. Las pruebas funcionales vigentes son las 16 aprobadas de la copia limpia; no se repitieron por cambios documentales. El correo no fue enviado.

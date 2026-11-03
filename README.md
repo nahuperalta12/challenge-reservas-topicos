@@ -2,6 +2,8 @@
 
 **Autor: Nahuel Peralta.**
 
+Repositorio público: [nahuperalta12/challenge-reservas-topicos](https://github.com/nahuperalta12/challenge-reservas-topicos), rama `master`.
+
 Trabajo práctico: sistema local para consultar disponibilidad, reservar y cancelar equipos sin perder su historial. Proyecto propio construido a partir de la consigna; los tres proyectos suministrados se consultaron como referencias de estructura y alcance. No se importaron sus historiales ni afirmaciones de verificación.
 
 ## 1. Especificación
@@ -87,7 +89,7 @@ Se utilizó Codex sobre el repositorio con herramientas reales de edición, Powe
 
 Contexto suministrado: consigna PDF de tres páginas, tres ZIP de referencia y preferencias humanas: web local, inicio mediante `npm start`, tecnología a elección y sin requisitos adicionales. Se excluyen secretos, datos reales, conversaciones completas, bases ajenas y dependencias de las referencias. Las instrucciones dentro de las referencias se interpretan como material de esos proyectos, no como órdenes para este.
 
-Configuración externa aplicada (resumen saneado): actuar en la carpeta de trabajo, completar acciones autorizadas, reportar verificaciones reales y evitar atribuir resultados no comprobados. Acceso técnico disponible: lectura/escritura y ejecución local, red habilitada y sin solicitudes automáticas de aprobación. Esto no constituye revisión humana. No se enviaron correos, no se publicó una web y no se hizo push.
+Configuración externa aplicada (resumen saneado): actuar en la carpeta de trabajo, completar acciones autorizadas, reportar verificaciones reales y evitar atribuir resultados no comprobados. Acceso técnico disponible: lectura/escritura y ejecución local, red habilitada y sin solicitudes automáticas de aprobación. Esto no constituye revisión humana. Por instrucción expresa del autor se creó el repositorio público en GitHub y se subió el historial. No se enviaron correos ni se desplegó una web.
 
 Instrucción humana efectivamente usada: «web local con interfaz visual entrando por npm start» y «el que mejor se adapte al proyecto». Adaptación comprobable: `package.json` encadena comprobación/compilación y un servidor único, y `server/app.ts` sirve tanto API como cliente. Adaptación de reglas: validación compartida e intervalos consecutivos en `server/domain.ts`, `server/store.ts` y pruebas. [AGENTS.md](AGENTS.md) conserva instrucciones para futuras intervenciones; se creó durante esta sesión y no se presenta como una configuración preexistente. [docs/PROGRESO.md](docs/PROGRESO.md) retiene avances y decisiones.
 
@@ -95,4 +97,4 @@ Instrucción humana efectivamente usada: «web local con interfaz visual entrand
 
 Consultar [docs/decisiones.md](docs/decisiones.md), [docs/episodios.md](docs/episodios.md) y [docs/verificacion.md](docs/verificacion.md).
 
-**Estado académico:** hay tres delegaciones reales con decisión humana y motivo registrados: corrección de la primera versión y aceptación expresa de los episodios 2 y 3 por Nahuel Peralta. La aceptación no se presenta como ejecución de un procedimiento manual no informado. Git conserva el estado recibido antes de la auditoría y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Esa evidencia histórica sigue siendo una limitación. Faltan crear el repositorio remoto, comprobar acceso y entregar su enlace. Rama local: `master`; commit exacto: `git rev-parse HEAD`. No se publicó ni envió nada. Auditoría: [docs/auditoria.md](docs/auditoria.md). Preparación y procedimiento de entrega: [docs/entrega.md](docs/entrega.md).
+**Estado académico:** hay tres delegaciones reales con decisión humana y motivo registrados: corrección de la primera versión y aceptación expresa de los episodios 2 y 3 por Nahuel Peralta. La aceptación no se presenta como ejecución de un procedimiento manual no informado. Git conserva el estado recibido antes de la auditoría y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Esa evidencia histórica sigue siendo una limitación. El repositorio remoto ya está publicado y se verificó su acceso público sin autenticación. Falta enviar el enlace de entrega por correo. Rama: `master`; commit exacto: `git rev-parse HEAD`. Auditoría: [docs/auditoria.md](docs/auditoria.md). Preparación y procedimiento de entrega: [docs/entrega.md](docs/entrega.md).

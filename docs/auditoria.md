@@ -16,11 +16,11 @@ Fuente leída íntegramente por el agente: `C:\Users\UPSTI-52\Downloads\challeng
 | Progreso y decisiones versionados | Git inicializado en esta auditoría. `0a27447` conserva el estado recibido, ya con las reglas del episodio 2. La especificación/código originales anteriores no están recuperados en Git; el registro narrativo no reemplaza esa evidencia. No se fabricó historia anterior. |
 | Tres episodios con decisión humana y motivo | Completado: episodio 1 corregido por decisión humana; episodios 2 y 3 aceptados expresamente por Nahuel Peralta el 2026-11-02 con motivos registrados en episodios.md. No se atribuye ejecución manual no informada. |
 | Evidencia ligada a versión | Commit del estado recibido y commit de esta auditoría consultables en `git log`. Los episodios anteriores no tenían commits propios. |
-| Entrega de enlace accesible por correo, asunto Challenge IA | Autor confirmado: Nahuel Peralta. El usuario informó que aún no subió el repositorio. Remoto, publicación, acceso y envío pendientes; instrucciones y borrador en entrega.md. Rama local master; commit obtenible con `git rev-parse HEAD`. |
+| Entrega de enlace accesible por correo, asunto Challenge IA | Autor: Nahuel Peralta. Repositorio público creado y master subida en https://github.com/nahuperalta12/challenge-reservas-topicos, acceso sin autenticación comprobado. Correo pendiente; borrador en entrega.md. Commit obtenible con `git rev-parse HEAD`. |
 
 ## Pendientes que no puede reemplazar una carga de datos
 
-Las decisiones y motivos humanos de los tres episodios están registrados. Sigue faltando la evidencia Git histórica anterior al primer commit local; no se puede sustituir por una reconstrucción presentada como original. Para entregar falta disponer del repositorio accesible y su enlace; la consigna solicita enviar ese enlace con asunto exacto `Challenge IA`. No se exige despliegue, autenticación, multiagente ni más estética.
+Las decisiones y motivos humanos de los tres episodios están registrados. Sigue faltando la evidencia Git histórica anterior al primer commit local; no se puede sustituir por una reconstrucción presentada como original. El repositorio ya es accesible; falta enviar su enlace con asunto exacto `Challenge IA`. No se exige despliegue, autenticación, multiagente ni más estética.
 
 No se efectuó revisión visual de la interfaz en esta auditoría. Los resultados automáticos y las comprobaciones HTTP se registran en `verificacion.md` y no se atribuyen al usuario.
 
