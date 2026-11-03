@@ -22,3 +22,12 @@ Estos resultados son del agente. No constituyen revisión humana ni comprobació
 8. Comprobar que los selectores ofrecen solo 00/15/30/45, desde 06:00 hasta 20:00; el inicio llega hasta 19:45 y el fin hasta 20:00. Para hoy, los inicios pasados deben estar deshabilitados. Intentar enviar horarios pasados o minutos no permitidos por la API: debe devolver 400 sin guardar reservas.
 
 Resultado humano observado: PENDIENTE. No se atribuye esta comprobación al usuario.
+
+## Auditoría y carga de datos · Episodio 3 · 2026-11-02
+
+- `npm.cmd test`: **16 pruebas aprobadas, 0 fallos**, incluidas las 14 anteriores y dos de la carga demo. Comprueban seis activos/dos cancelados, cinco unidades, conflictos, consecutivos, horario liberado y vuelto a reservar, repetición sin reactivar cancelaciones y conservación exacta de registros previos activos/cancelados en un día con conflictos. La prueba de persistencia entre procesos sigue aprobada.
+- `npm.cmd run build`: tipos TypeScript y compilación Vite correctos.
+- `npm.cmd run seed`: base local inicialmente vacía; ocho reservas creadas, fecha argentina 2026-11-03. Repetición real: cero creadas, mismos ocho ID y estados.
+- `npm.cmd start`: compiló e inició web/API en 127.0.0.1:3000. Proceso dejado en ejecución para revisión.
+- Comprobación con `node --input-type=module -e` y `fetch` sobre el servidor local: página HTTP 200; inventario de cinco unidades; historial de ocho registros, seis activos y dos cancelados. `/api/availability`, fecha 2026-11-03: MIC-01 10:30–11:30 ocupado; MIC-01 12:00–13:00 libre; OSC-01 09:00–10:00 libre; MIC-02 15:00–16:00 ocupado por la nueva reserva activa. Todas coincidieron con lo esperado.
+- No se ejecutó revisión visual ni revisión humana del resultado. No se realizó entrega externa. La carga de ejemplos no sustituye las pruebas automáticas y no se usa como base de esas pruebas.

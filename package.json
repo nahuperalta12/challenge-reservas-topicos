@@ -8,6 +8,7 @@
     "start": "npm run build && tsx server/index.ts",
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test tests/*.test.ts",
+    "seed": "tsx server/seed.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

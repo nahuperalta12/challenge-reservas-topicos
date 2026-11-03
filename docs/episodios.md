@@ -18,6 +18,11 @@
 - **Evidencia:** `shared/schedule.ts`, `server/domain.ts`, `server/store.ts`, `src/main.tsx`, `tests/reservations.test.ts`, `docs/verificacion.md`.
 - **Decisión humana sobre esta corrección:** PENDIENTE. No se atribuye aceptación automática.
 
-## Episodio 3
+## 3 · Auditoría de requisitos y datos de ejemplo (2026-11-02)
 
-PENDIENTE DE OCURRIR. Debe surgir de una nueva delegación real y su revisión humana; no es evidencia completada.
+- **Objetivo / requisito:** contrastar el proyecto con la consigna y disponer de registros reproducibles para probar R1–R8.
+- **Contexto:** código actual, README, progreso, pruebas, base local vacía y consigna original `challenge-agents.pdf` de tres páginas.
+- **Extracto humano:** «este proyecto cuample con tos los requisitos solicitaos? no existen registros cargados, tambien podrias rellenar algunos como para cumplir con las pruebas y todo lo que se solicite».
+- **Acción del agente:** auditoría documentada, comando de carga explícita `npm run seed`, ocho registros ficticios, pruebas de la carga y conservación de registros anteriores; inicialización local de Git sin publicar.
+- **Evidencia:** `server/demo.ts`, `server/seed.ts`, `tests/demo.test.ts`, `docs/auditoria.md`, `docs/datos-demo.md` y `docs/verificacion.md`. El commit `0a27447` captura el estado recibido antes del cambio; la versión del episodio se identifica con el commit que agrega estos archivos en `git log`.
+- **Decisión humana sobre este resultado:** PENDIENTE. La solicitud es una delegación real, no una aceptación de los resultados de los episodios 2 o 3. Debe registrarse la decisión y su motivo cuando el usuario efectivamente los comunique.

@@ -52,6 +52,8 @@ Abrir **http://localhost:3000**. `npm start` comprueba tipos, compila y arranca 
 
 El inventario no requiere carga manual. La base se crea automáticamente en `data/reservas.sqlite`. Reiniciar la aplicación **no elimina reservas**. `RESERVAS_DB` permite otra ruta; las rutas relativas se resuelven desde la raíz del proyecto. Para empezar con datos vacíos sin perder el historial anterior, detener el servidor y elegir otra ruta de base. No hay un botón de borrado ni se necesita borrar el archivo. Respaldar copiando la base con el servidor detenido.
 
+Para cargar reservas ficticias reproducibles, ejecutar `npm run seed`. Agrega ocho registros `[DEMO]` (seis activos y dos cancelados) para mañana en Argentina, o el siguiente día sin conflictos dentro de 366 días. Usa las mismas validaciones y operaciones de reserva/cancelación del sistema. Incluye consecutivos, unidades simultáneas, cancelación que deja libre un horario y un horario reservado nuevamente. No borra ni modifica registros anteriores. Si ya encuentra registros `[DEMO]`, no vuelve a cargarlos ni reactiva cancelaciones. No se ejecuta automáticamente al arrancar. Respeta `RESERVAS_DB`. Guía de uso y datos efectivamente cargados: [docs/datos-demo.md](docs/datos-demo.md).
+
 ```sh
 npm test
 npm run typecheck
@@ -69,7 +71,7 @@ Content-Type: application/json
 
 Devuelve HTTP 201 y un objeto con ID numérico, `status: "ACTIVA"` y fechas UTC en milisegundos. `GET /api/inventory`, `GET /api/reservations` y `GET /api/availability?unit=MIC-01&start=2026-11-03T10:00&end=2026-11-03T11:00` permiten consultar. Cancelar: `POST /api/reservations/1/cancel`. Validaciones devuelven 400; conflictos 409; reserva inexistente 404. El formato y los campos pertenecen a esta API, no a los proyectos de referencia.
 
-**Limitaciones:** uso local, sin cuentas ni permisos por persona, sin paginación ni concurrencia distribuida. No incluye copias automáticas. `node:sqlite` puede emitir un aviso de experimental según la versión. La interfaz requiere revisión humana; consultar el registro de verificación antes de asumir qué se probó. La entrega y las tres decisiones humanas permanecen pendientes.
+**Limitaciones:** uso local, sin cuentas ni permisos por persona, sin paginación ni concurrencia distribuida. No incluye copias automáticas. `node:sqlite` puede emitir un aviso de experimental según la versión. La interfaz requiere revisión humana; consultar el registro de verificación antes de asumir qué se probó. La entrega y las revisiones humanas de los episodios 2 y 3 permanecen pendientes.
 
 ## 3. Preparación del agente
 
@@ -85,4 +87,4 @@ Instrucción humana efectivamente usada: «web local con interfaz visual entrand
 
 Consultar [docs/decisiones.md](docs/decisiones.md), [docs/episodios.md](docs/episodios.md) y [docs/verificacion.md](docs/verificacion.md).
 
-**Estado académico:** la consigna exige tres episodios reales con revisión humana. El usuario pidió corregir la primera versión agregando horario operativo, cuartos de hora y rechazo de horarios pasados; esta nueva delegación se registra como episodio 2, pendiente de revisión del resultado. Falta un tercer episodio real y completar las revisiones humanas. También falta crear/publicar el repositorio de entrega con la evolución en Git e identificar autor, rama y commit.
+**Estado académico:** hay tres delegaciones reales registradas; las decisiones humanas sobre los resultados de los episodios 2 y 3 siguen pendientes. Se inicializó Git durante la auditoría: conserva el estado recibido antes de este cambio y su evolución posterior; no recupera retrospectivamente la primera versión anterior a las restricciones horarias. Faltan completar esa evidencia histórica si existe, identificar autor y preparar el enlace del repositorio accesible para la entrega. Rama local: `master`; commit exacto: `git rev-parse HEAD`. No se publicó ni envió nada. Auditoría contra la consigna original: [docs/auditoria.md](docs/auditoria.md).
